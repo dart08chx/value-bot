@@ -96,11 +96,10 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton() || !interaction.customId.startsWith('select_item_')) return;
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    await interaction.deferReply({ flags: 64 });   // 64 = Ephemeral
 
     const index = parseInt(interaction.customId.split('_')[2]);
 
-    // Safely get the selected item (this was the main cause of "interaction failed")
     let selectedItem = 'Unknown Item';
     try {
         if (interaction.message && interaction.message.components) {
