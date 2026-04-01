@@ -10,20 +10,16 @@ const client = new Client({
 
 const VALUE_CHANNEL_ID = '1488825962329014292';
 
-// All tradable items in Super Striker League
+// All tradable items
 const allItems = [
-    // Divine Gears - Common
     'level 100 common', 'level 110 common', 'level 120 common', 'level 130 common', 'level 135 common',
     'level 140 common', 'level 145 common', 'level 150 common', 'level 155 common', 'level 160 common',
     'level 165 common', 'level 170 common', 'level 173 common', 'level 175 common',
-    // Legendary
     'level 140 legendary', 'level 150 legendary', 'level 155 legendary', 'level 160 legendary',
     'level 165 legendary', 'level 170 legendary', 'level 173 legendary', 'level 175 legendary',
     'level 180 legendary', 'level 185 legendary', 'level 190 legendary', 'level 195 legendary', 'level 200 legendary',
-    // Phoenix
     'level 150 phoenix', 'level 160 phoenix', 'level 170 phoenix', 'level 175 phoenix',
     'level 180 phoenix', 'level 185 phoenix', 'level 190 phoenix', 'level 195 phoenix', 'level 200 phoenix',
-    // Trinkets
     '555 sprint', '455 sprint', '355 sprint', '255 sprint', '155 sprint', '055 sprint', '054 sprint', '045 sprint',
     '550 sprint', '551 sprint', '552 sprint', '553 sprint', '554 sprint', '545 sprint', '535 sprint', '505 sprint',
     '454 sprint', '445 sprint', '544 sprint', '533 sprint', '345 sprint', '543 sprint',
@@ -39,11 +35,9 @@ const allItems = [
     '555 curve', '455 curve', '355 curve', '255 curve', '155 curve', '055 curve', '054 curve', '045 curve',
     '550 curve', '551 curve', '552 curve', '553 curve', '554 curve', '545 curve', '535 curve', '505 curve',
     '454 curve', '445 curve', '544 curve', '533 curve', '345 curve', '543 curve',
-    // Tools
     'extraction kit', 'stat rec', 'item aug', 'orb', 'overclock', 'slot unlock'
 ];
 
-// Fuzzy search - finds up to 5 closest matches
 function findSimilarItems(query) {
     const lowerQuery = query.toLowerCase();
     return allItems
@@ -70,55 +64,3 @@ client.once('clientReady', async () => {
 
 client.on('messageCreate', async message => {
     if (message.channel.id !== VALUE_CHANNEL_ID) return;
-    if (message.author.bot) return;
-
-    const query = message.content.trim();
-    if (query.length < 2) return;
-
-    const matches = findSimilarItems(query);
-    if (matches.length === 0) return;
-
-    const buttons = matches.map((item, index) => 
-        new ButtonBuilder()
-            .setCustomId(`select_item_${index}`)
-            .setLabel(item.length > 80 ? item.substring(0, 77) + '...' : item)
-            .setStyle(ButtonStyle.Secondary)
-    );
-
-    const rows = [];
-    for (let i = 0; i < buttons.length; i += 5) {
-        rows.push(new ActionRowBuilder().addComponents(buttons.slice(i, i + 5)));
-    }
-
-    await message.reply({
-        content: `🔍 Found similar items. Click the correct one:`,
-        components: rows
-    });
-});
-
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isButton() || !interaction.customId.startsWith('select_item_')) return;
-
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
-
-    const index = parseInt(interaction.customId.split('_')[2]);
-    const buttons = interaction.message.components.flatMap(row => row.components);
-    const selectedItem = buttons[index] ? buttons[index].label : 'Unknown Item';
-
-    // Placeholder values - you will provide real values later
-    const embed = new EmbedBuilder()
-        .setColor(0x00ff88)
-        .setTitle(`📊 ${selectedItem}`)
-        .addFields(
-            { name: '💰 Cash Value', value: 'PLACEHOLDER', inline: true },
-            { name: '📈 Demand', value: 'PLACEHOLDER', inline: true },
-            { name: '📉 Trend', value: 'PLACEHOLDER', inline: true },
-            { name: '📝 Explanation', value: 'Real values and explanation will be added when you provide them.' }
-        )
-        .setFooter({ text: 'Super Striker League Value Bot' })
-        .setTimestamp();
-
-    await interaction.editReply({ embeds: [embed] });
-});
-
-client.login(process.env.TOKEN);
