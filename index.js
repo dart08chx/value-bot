@@ -12,15 +12,13 @@ const VALUE_CHANNEL_ID = '1488825962329014292';
 
 // All tradable items in Super Striker League
 const allItems = [
-    // Divine Gears - Common
+    // Divine Gears
     'level 100 common', 'level 110 common', 'level 120 common', 'level 130 common', 'level 135 common',
     'level 140 common', 'level 145 common', 'level 150 common', 'level 155 common', 'level 160 common',
     'level 165 common', 'level 170 common', 'level 173 common', 'level 175 common',
-    // Legendary
     'level 140 legendary', 'level 150 legendary', 'level 155 legendary', 'level 160 legendary',
     'level 165 legendary', 'level 170 legendary', 'level 173 legendary', 'level 175 legendary',
     'level 180 legendary', 'level 185 legendary', 'level 190 legendary', 'level 195 legendary', 'level 200 legendary',
-    // Phoenix
     'level 150 phoenix', 'level 160 phoenix', 'level 170 phoenix', 'level 175 phoenix',
     'level 180 phoenix', 'level 185 phoenix', 'level 190 phoenix', 'level 195 phoenix', 'level 200 phoenix',
     // Trinkets
@@ -101,18 +99,22 @@ client.on('interactionCreate', async interaction => {
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const index = parseInt(interaction.customId.split('_')[2]);
-    let selectedItem = 'Unknown Item';
 
-    // Safely extract the selected item label
-    if (interaction.message && interaction.message.components) {
-        for (const row of interaction.message.components) {
-            for (const component of row.components) {
-                if (component.customId === interaction.customId) {
-                    selectedItem = component.label || 'Unknown Item';
-                    break;
+    // Safely get the selected item (this was the main cause of "interaction failed")
+    let selectedItem = 'Unknown Item';
+    try {
+        if (interaction.message && interaction.message.components) {
+            for (const row of interaction.message.components) {
+                for (const component of row.components) {
+                    if (component && component.customId === interaction.customId) {
+                        selectedItem = component.label || 'Unknown Item';
+                        break;
+                    }
                 }
             }
         }
+    } catch (e) {
+        console.error('Failed to get button label', e);
     }
 
     const embed = new EmbedBuilder()
