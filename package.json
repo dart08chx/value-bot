@@ -1,0 +1,12 @@
+{
+  "name": "ssl-value-bot",
+  "version": "1.0.0",
+  "description": "Super Striker League Value Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.18.0"
+  }
+}
