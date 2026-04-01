@@ -43,7 +43,7 @@ const allItems = [
     'extraction kit', 'stat rec', 'item aug', 'orb', 'overclock', 'slot unlock'
 ];
 
-// Simple fuzzy search
+// Fuzzy search - finds up to 5 closest matches
 function findSimilarItems(query) {
     const lowerQuery = query.toLowerCase();
     return allItems
@@ -53,7 +53,7 @@ function findSimilarItems(query) {
             if (lowerItem === lowerQuery) score = 100;
             else if (lowerItem.includes(lowerQuery)) score = 90;
             else {
-                const queryWords = lowerQuery.split(' ');
+                const queryWords = lowerQuery.split(/\s+/);
                 score = queryWords.filter(word => lowerItem.includes(word)).length * 30;
             }
             return { item, score };
@@ -105,15 +105,15 @@ client.on('interactionCreate', async interaction => {
     const buttons = interaction.message.components.flatMap(row => row.components);
     const selectedItem = buttons[index] ? buttons[index].label : 'Unknown Item';
 
-    // Placeholder values - replace later when you give real values
+    // Placeholder values - you will provide real values later
     const embed = new EmbedBuilder()
         .setColor(0x00ff88)
         .setTitle(`📊 ${selectedItem}`)
         .addFields(
-            { name: '💰 Cash Value', value: 'PLACEHOLDER (e.g. 850k)', inline: true },
-            { name: '📈 Demand', value: 'PLACEHOLDER (e.g. High)', inline: true },
-            { name: '📉 Trend', value: 'PLACEHOLDER (e.g. Rising)', inline: true },
-            { name: '📝 Explanation', value: 'Real explanation will be added here when you provide the values.' }
+            { name: '💰 Cash Value', value: 'PLACEHOLDER', inline: true },
+            { name: '📈 Demand', value: 'PLACEHOLDER', inline: true },
+            { name: '📉 Trend', value: 'PLACEHOLDER', inline: true },
+            { name: '📝 Explanation', value: 'Real values and explanation will be added when you provide them.' }
         )
         .setFooter({ text: 'Super Striker League Value Bot' })
         .setTimestamp();
