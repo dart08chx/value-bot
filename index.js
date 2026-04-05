@@ -114,24 +114,26 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton() || !interaction.customId.startsWith('select_item_')) return;
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    await interaction.deferReply({ flags: 64 }); // 64 = Ephemeral
 
     const index = parseInt(interaction.customId.split('_')[2]);
+
     let selectedItem = 'Unknown Item';
 
+    // Safest way to get the button label
     try {
         if (interaction.message && interaction.message.components) {
             for (const row of interaction.message.components) {
-                for (const component of row.components) {
-                    if (component && component.customId === interaction.customId) {
-                        selectedItem = component.label || 'Unknown Item';
+                for (const comp of row.components) {
+                    if (comp && comp.customId === interaction.customId) {
+                        selectedItem = comp.label || 'Unknown Item';
                         break;
                     }
                 }
             }
         }
     } catch (e) {
-        console.error('Failed to get button label', e);
+        console.error('Button label error:', e);
     }
 
     const cashValue = itemValues[selectedItem.toLowerCase()] || 'Not set yet';
