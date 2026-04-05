@@ -10,7 +10,7 @@ const client = new Client({
 
 const VALUE_CHANNEL_ID = '1488825962329014292';
 
-// All items with their cash values
+// All items with their cash values (you can add more later)
 const itemValues = {
     'level 100 common': '350k',
     'level 110 common': '400k',
@@ -79,6 +79,30 @@ function findSimilarItems(query) {
         .map(item => item.item);
 }
 
+// Convert "350k" → "$350,000" and "2.5m" → "$2,500,000"
+function formatCashValue(value) {
+    if (!value) return 'Not set';
+
+    let num = value.toLowerCase().trim();
+    let multiplier = 1;
+
+    if (num.endsWith('m')) {
+        multiplier = 1000000;
+        num = num.replace('m', '');
+    } else if (num.endsWith('k')) {
+        multiplier = 1000;
+        num = num.replace('k', '');
+    }
+
+    let number = parseFloat(num);
+    if (isNaN(number)) return value;
+
+    number *= multiplier;
+
+    // Format with commas and add $
+    return '$' + number.toLocaleString('en-US');
+}
+
 client.once('clientReady', async () => {
     console.log(`✅ Super Striker League Value Bot is online`);
 });
@@ -114,13 +138,12 @@ client.on('messageCreate', async message => {
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton() || !interaction.customId.startsWith('select_item_')) return;
 
-    await interaction.deferReply({ flags: 64 }); // 64 = Ephemeral
+    await interaction.deferReply({ flags: 64 });
 
     const index = parseInt(interaction.customId.split('_')[2]);
 
     let selectedItem = 'Unknown Item';
 
-    // Safest way to get the button label
     try {
         if (interaction.message && interaction.message.components) {
             for (const row of interaction.message.components) {
@@ -136,7 +159,7 @@ client.on('interactionCreate', async interaction => {
         console.error('Button label error:', e);
     }
 
-    const cashValue = itemValues[selectedItem.toLowerCase()] || 'Not set yet';
+    const cashValue = formatCashValue(itemValues[selectedItem.toLowerCase()]);
 
     const embed = new EmbedBuilder()
         .setColor(0x00ff88)
